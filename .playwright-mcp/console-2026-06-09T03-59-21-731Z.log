@@ -1,0 +1,4 @@
+[      38ms] ReferenceError: rentaPnExento is not defined
+    at renderTable (http://localhost:8000/app.js:1031:233)
+    at update (http://localhost:8000/app.js:1258:9)
+    at HTMLDocument.<anonymous> (http://localhost:8000/app.js:1263:5)

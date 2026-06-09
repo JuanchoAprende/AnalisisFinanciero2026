@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Punto de Equilibrio y Finanzas Empresariales</title>
+    <meta name="description" content="Simulador interactivo para comparar esquemas financieros de Persona Natural vs Empresa, calcular el punto de equilibrio y proyectar impuestos.">
+    <link rel="preconnect" href="https://fonts.googleapis">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="logo-text">
+                    <h1>FINANZAS <span>SIM</span></h1>
+                    <p>Comparativa Financiera e Impuestos (DIAN)</p>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="badge badge-info">Año Fiscal 2026</span>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- SIDEBAR: PARÁMETROS -->
+            <aside class="sidebar-params">
+                <div class="sidebar-section-title">
+                    <svg viewBox="0 0 24 24" class="section-icon"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                    <h2>Parámetros de Simulación</h2>
+                </div>
+
+                <div class="params-tabs">
+                    <button class="tab-btn active" data-target="tab-negocio">Contratos</button>
+                    <button class="tab-btn" data-target="tab-costos">Gastos</button>
+                    <button class="tab-btn" data-target="tab-impuestos">Impuestos / Deuda</button>
+                </div>
+
+                <!-- TAB NEGOCIO -->
+                <div class="tab-content active" id="tab-negocio">
+                    <div class="form-group">
+                        <label for="input-cuota">Valor Cuota Base ($)</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-cuota" value="200000" min="50000" max="1000000" step="5000">
+                            <input type="range" id="slider-cuota" value="200000" min="50000" max="1000000" step="5000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-motos">Cantidad de Motos / Contratos</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-motos" value="40" min="1" max="200" step="1">
+                            <input type="range" id="slider-motos" value="40" min="1" max="200" step="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-multiplier">Multiplicador por Contrato (Pagos/Mes)</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-multiplier" value="4" min="1" max="10" step="1">
+                            <input type="range" id="slider-multiplier" value="4" min="1" max="10" step="1">
+                        </div>
+                        <small class="help-text">Equivale a cuántas cuotas mensuales se reciben por moto (factor de escala).</small>
+                    </div>
+
+                    <div class="form-group" style="flex-direction: row; align-items: center; justify-content: space-between; margin-top: 8px; margin-bottom: 12px;">
+                        <label for="input-iva-incluido" style="cursor: pointer; margin-bottom: 0;">Cuota Base Incluye IVA</label>
+                        <label class="switch">
+                            <input type="checkbox" id="input-iva-incluido" checked>
+                            <span class="slider-switch"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group percent-group">
+                            <label>Distribución de Cuota (%)</label>
+                            <div class="percent-sliders">
+                                <div class="slider-row">
+                                    <span>Anticipo</span>
+                                    <input type="range" id="percent-anticipo" min="0" max="100" value="20">
+                                    <span id="label-anticipo">20%</span>
+                                </div>
+                                <div class="slider-row">
+                                    <span>Provisión Compra</span>
+                                    <input type="range" id="percent-provision" min="0" max="100" value="15">
+                                    <span id="label-provision">15%</span>
+                                </div>
+                                <div class="slider-row">
+                                    <span>Arrendamiento</span>
+                                    <input type="range" id="percent-arrendamiento" min="0" max="100" value="65" disabled>
+                                    <span id="label-arrendamiento">65%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB GASTOS -->
+                <div class="tab-content" id="tab-costos">
+                    <div class="form-group">
+                        <label for="input-honorarios">Honorarios Profesionales ($/mes)</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-honorarios" value="2000000" min="0" max="10000000" step="100000">
+                            <input type="range" id="slider-honorarios" value="2000000" min="0" max="10000000" step="100000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-mantenimiento">Mantenimientos / Adecuaciones ($/mes)</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-mantenimiento" value="500000" min="0" max="5000000" step="50000">
+                            <input type="range" id="slider-mantenimiento" value="500000" min="0" max="5000000" step="50000">
+                        </div>
+                    </div>
+
+                    <div class="sidebar-divider">Nómina - Salario Mínimo Legal</div>
+                    
+                    <div class="form-group">
+                        <label for="input-smmlv">Valor SMMLV ($)</label>
+                        <input type="number" id="input-smmlv" value="1750905">
+                        <small class="help-text">Salario de referencia en la simulación.</small>
+                    </div>
+
+                    <div class="form-group" style="flex-direction: row; align-items: center; justify-content: space-between; margin-top: 8px;">
+                        <label for="input-exonerado" style="cursor: pointer; margin-bottom: 0;">Exoneración Aportes (Art. 114-1 E.T.)</label>
+                        <label class="switch">
+                            <input type="checkbox" id="input-exonerado" checked>
+                            <span class="slider-switch"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="button" class="btn-secondary" id="btn-show-payroll-modal" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; font-weight: 600; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface-elevated); color: var(--text-primary); cursor: pointer; transition: var(--transition-fast);">
+                            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                            Ver Desglose de Nómina Patronal
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-auxtrans">Auxilio de Transporte ($)</label>
+                        <input type="number" id="input-auxtrans" value="249095">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-pn-nomina-adj">Ajuste Nómina Persona Natural ($/mes)</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-pn-nomina-adj" value="0" min="-10000000" max="5000000" step="50000">
+                            <input type="range" id="slider-pn-nomina-adj" value="0" min="-10000000" max="5000000" step="50000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-empresa-nomina-adj">Ajuste Nómina Empresa ($/mes)</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-empresa-nomina-adj" value="1000000" min="-5000000" max="10000000" step="50000">
+                            <input type="range" id="slider-empresa-nomina-adj" value="1000000" min="-5000000" max="10000000" step="50000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB IMPUESTOS / DEUDA -->
+                <div class="tab-content" id="tab-impuestos">
+                    <div class="sidebar-divider">Impuestos Nacionales y Municipales</div>
+
+                    <div class="form-group">
+                        <label for="input-uvt">Valor UVT ($ 2026)</label>
+                        <input type="number" id="input-uvt" value="52374">
+                        <small class="help-text">Unidad de Valor Tributario oficial para el año fiscal 2026.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input-ica-rate">Tarifa ICA (%)</label>
+                        <input type="number" id="input-ica-rate" value="1.0" min="0" max="5" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-iva-rate">Tarifa IVA (%)</label>
+                        <input type="number" id="input-iva-rate" value="19.0" min="0" max="25" step="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-iva-threshold">Tope IVA Persona Natural ($ Anual)</label>
+                        <input type="number" id="input-iva-threshold" value="183309000">
+                        <small class="help-text">Ingresos por debajo de este valor están exentos de IVA para P. Natural.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-renta-empresa-rate">Tarifa Renta Empresa (%)</label>
+                        <input type="number" id="input-renta-empresa-rate" value="35.0" min="0" max="45" step="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-renta-pn-exento">Base Renta Exenta P. Natural ($ Anual)</label>
+                        <input type="number" id="input-renta-pn-exento" value="57087660" disabled>
+                        <small class="help-text">Calculado automáticamente como 1.090 UVT.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-renta-pn-bracket-limit">Límite Primer Tramo 19% P. Natural ($)</label>
+                        <input type="number" id="input-renta-pn-bracket-limit" value="89035800" disabled>
+                        <small class="help-text">Calculado automáticamente como 1.700 UVT.</small>
+                    </div>
+
+                    <div class="sidebar-divider">Financiamiento (Crédito)</div>
+
+                    <div class="form-group">
+                        <label for="input-credito-mensual">Crédito Mensual ($)</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-credito-mensual" value="12400000" min="0" max="30000000" step="100000">
+                            <input type="range" id="slider-credito-mensual" value="12400000" min="0" max="30000000" step="100000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-credito-meses">Meses de Amortización Anual</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-credito-meses" value="12" min="1" max="12" step="1">
+                            <input type="range" id="slider-credito-meses" value="12" min="1" max="12" step="1">
+                        </div>
+                        <small class="help-text">En el Excel original se multiplicaba por 6 de forma inconsistente en algunas hojas.</small>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- CONTENIDO PRINCIPAL -->
+            <main class="content-area">
+                <!-- CARDS DE METRICAS CLAVE -->
+                <section class="metrics-grid">
+                    <!-- PERSONA NATURAL -->
+                    <div class="metric-card card-pn">
+                        <div class="card-glow"></div>
+                        <div class="metric-header">
+                            <h3>Persona Natural</h3>
+                            <span class="badge-card">Esquema B</span>
+                        </div>
+                        <div class="metric-main">
+                            <div class="metric-item">
+                                <span class="metric-label">Utilidad Neta Tributaria</span>
+                                <span class="metric-value" id="val-pn-utilidad">$0</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Caja Final ("Dinero Real")</span>
+                                <span class="metric-value-cash" id="val-pn-dinero">$0</span>
+                            </div>
+                        </div>
+                        <div class="metric-footer">
+                            <span id="footer-pn-renta">Impuesto Renta: $0</span>
+                            <span id="footer-pn-iva">IVA: $0</span>
+                        </div>
+                    </div>
+
+                    <!-- EMPRESA -->
+                    <div class="metric-card card-empresa">
+                        <div class="card-glow"></div>
+                        <div class="metric-header">
+                            <h3>Empresa / S.A.S.</h3>
+                            <span class="badge-card">Esquema C</span>
+                        </div>
+                        <div class="metric-main">
+                            <div class="metric-item">
+                                <span class="metric-label">Utilidad Neta Tributaria</span>
+                                <span class="metric-value" id="val-emp-utilidad">$0</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Caja Final ("Dinero Real")</span>
+                                <span class="metric-value-cash" id="val-emp-dinero">$0</span>
+                            </div>
+                        </div>
+                        <div class="metric-footer">
+                            <span id="footer-emp-renta">Impuesto Renta: $0</span>
+                            <span id="footer-emp-iva">IVA: $0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- INTERACTIVE PUNTO DE EQUILIBRIO SECTION -->
+                <section class="section-card chart-section">
+                    <div class="section-card-header">
+                        <div class="header-title-group">
+                            <svg viewBox="0 0 24 24" class="card-icon"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <h2>Análisis de Punto de Equilibrio (Break-Even)</h2>
+                        </div>
+                        <div class="chart-toggles">
+                            <button class="chart-toggle-btn active" id="btn-chart-utilidad">Utilidad Neta</button>
+                            <button class="chart-toggle-btn" id="btn-chart-dinero">Caja Final</button>
+                        </div>
+                    </div>
+
+                    <div class="chart-layout">
+                        <div class="chart-wrapper">
+                            <!-- SVG Chart Container -->
+                            <svg id="equilibrium-chart" viewBox="0 0 600 320" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="gradient-pn-fill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
+                                        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                    <linearGradient id="gradient-emp-fill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.15"/>
+                                        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Grid Lines -->
+                                <g class="grid-lines" id="chart-grid"></g>
+                                <!-- Curve Paths -->
+                                <path id="path-pn" fill="url(#gradient-pn-fill)" stroke="#3b82f6" stroke-width="3" d=""/>
+                                <path id="path-emp" fill="url(#gradient-emp-fill)" stroke="#8b5cf6" stroke-width="3" d=""/>
+                                <!-- Zero Line -->
+                                <line id="zero-line" x1="45" y1="160" x2="570" y2="160" stroke="#4b5563" stroke-width="1.5" stroke-dasharray="4,4"/>
+                                <!-- Interactive Hover Line -->
+                                <line id="hover-line" x1="0" y1="20" x2="0" y2="290" stroke="#9ca3af" stroke-width="1" stroke-dasharray="2,2" style="display:none;"/>
+                                <!-- Points of Equilibrium -->
+                                <circle id="point-eq-pn" cx="0" cy="0" r="6" fill="#60a5fa" stroke="#0d1117" stroke-width="2" style="display:none;"/>
+                                <circle id="point-eq-emp" cx="0" cy="0" r="6" fill="#a78bfa" stroke="#0d1117" stroke-width="2" style="display:none;"/>
+                                <!-- X and Y Axes -->
+                                <line x1="45" y1="20" x2="45" y2="290" stroke="#4b5563" stroke-width="2"/>
+                                <line x1="45" y1="290" x2="570" y2="290" stroke="#4b5563" stroke-width="2"/>
+                                <g id="chart-labels-x" fill="#9ca3af" font-size="10" text-anchor="middle"></g>
+                                <g id="chart-labels-y" fill="#9ca3af" font-size="10" text-anchor="end"></g>
+                            </svg>
+                            <div class="chart-tooltip" id="chart-tooltip"></div>
+                        </div>
+
+                        <div class="eq-stats-panel">
+                            <div class="eq-stat-box box-pn">
+                                <h4>Punto de Equilibrio (P. Natural)</h4>
+                                <div class="eq-stat-metric">
+                                    <span class="eq-value" id="val-eq-motos-pn">0</span>
+                                    <span class="eq-unit">motos</span>
+                                </div>
+                                <p class="eq-desc" id="val-eq-desc-pn">Requiere facturar $0 mensuales.</p>
+                            </div>
+                            <div class="eq-stat-box box-empresa">
+                                <h4>Punto de Equilibrio (Empresa)</h4>
+                                <div class="eq-stat-metric">
+                                    <span class="eq-value" id="val-eq-motos-emp">0</span>
+                                    <span class="eq-unit">motos</span>
+                                </div>
+                                <p class="eq-desc" id="val-eq-desc-emp">Requiere facturar $0 mensuales.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="legend-color legend-pn"></span> Persona Natural</div>
+                        <div class="legend-item"><span class="legend-color legend-emp"></span> Empresa (SAS)</div>
+                        <div class="legend-item"><span class="legend-style dash-line"></span> Nivel de Equilibrio (Cero)</div>
+                    </div>
+                </section>
+
+                <!-- TABLA COMPARATIVA DETALLADA -->
+                <section class="section-card table-section">
+                    <div class="section-card-header">
+                        <div class="header-title-group">
+                            <svg viewBox="0 0 24 24" class="card-icon"><path d="M3 10h18M3 14h18M3 18h18M3 6h18M3 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            <h2>Detalle de Proyecciones Mensuales y Anuales</h2>
+                        </div>
+                        <div class="table-actions">
+                            <button class="view-toggle-btn active" id="btn-view-mensual">Mensual</button>
+                            <button class="view-toggle-btn" id="btn-view-anual">Anual</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="financial-table">
+                            <thead>
+                                <tr>
+                                    <th>Concepto Financiero</th>
+                                    <th class="col-pn">Persona Natural (B)</th>
+                                    <th class="col-empresa">Empresa / SAS (C)</th>
+                                    <th>Diferencia Absoluta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Filas generadas dinámicamente por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL: DESGLOSE DE NÓMINA PATRONAL -->
+    <div class="modal-backdrop" id="payroll-modal" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Desglose de Nómina Patronal Completa (2026)</h3>
+                <button class="modal-close-btn" id="btn-close-payroll-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+                    Costos mensuales obligatorios a cargo del empleador para contratar un trabajador devengando el Salario Mínimo Legal Mensual Vigente (SMMLV) en Colombia, comparando con la cotización del contratista independiente (Persona Natural).
+                </p>
+                
+                <table class="modal-table">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Fórmula / Tarifa</th>
+                            <th style="text-align: right;">Persona Natural (B)</th>
+                            <th style="text-align: right;">Empresa / SAS (C)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Sueldo Básico (SMMLV)</strong></td>
+                            <td>Fijo de Ley</td>
+                            <td style="text-align: right;" id="modal-pn-salario">-</td>
+                            <td style="text-align: right;" id="modal-emp-salario">-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Auxilio de Transporte</strong></td>
+                            <td>Fijo de Ley (&lt; 2 SMMLV)</td>
+                            <td style="text-align: right;" id="modal-pn-auxtrans">-</td>
+                            <td style="text-align: right;" id="modal-emp-auxtrans">-</td>
+                        </tr>
+                        <tr class="modal-table-divider">
+                            <td colspan="4" style="font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted);">Seguridad Social y Parafiscales</td>
+                        </tr>
+                        <tr>
+                            <td>Salud (Aporte Patronal)</td>
+                            <td id="modal-desc-salud">Exento (Art. 114-1 ET) o 8.5%</td>
+                            <td style="text-align: right;" id="modal-pn-salud">-</td>
+                            <td style="text-align: right;" id="modal-emp-salud">-</td>
+                        </tr>
+                        <tr>
+                            <td>Pensión (Aporte Patronal)</td>
+                            <td id="modal-desc-pension">12% Empresa / 16% Indep.</td>
+                            <td style="text-align: right;" id="modal-pn-pension">-</td>
+                            <td style="text-align: right;" id="modal-emp-pension">-</td>
+                        </tr>
+                        <tr>
+                            <td>Riesgos Laborales (ARL - Clase I)</td>
+                            <td>0.522% sobre IBC</td>
+                            <td style="text-align: right;">$0 (No aplica)</td>
+                            <td style="text-align: right;" id="modal-emp-arl">-</td>
+                        </tr>
+                        <tr>
+                            <td>Caja de Compensación Familiar</td>
+                            <td>4% sobre IBC</td>
+                            <td style="text-align: right;">$0 (No aplica)</td>
+                            <td style="text-align: right;" id="modal-emp-caja">-</td>
+                        </tr>
+                        <tr>
+                            <td>SENA & ICBF (Parafiscales)</td>
+                            <td id="modal-desc-parafiscales">Exento (Art. 114-1 ET) o 5%</td>
+                            <td style="text-align: right;">$0 (No aplica)</td>
+                            <td style="text-align: right;" id="modal-emp-parafiscales">-</td>
+                        </tr>
+                        <tr class="modal-table-divider">
+                            <td colspan="4" style="font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted);">Prestaciones Sociales (Provisiones Mensuales)</td>
+                        </tr>
+                        <tr>
+                            <td>Prima de Servicios</td>
+                            <td>8.33% sobre Salario + Aux. Trans.</td>
+                            <td style="text-align: right;">$0 (No aplica)</td>
+                            <td style="text-align: right;" id="modal-emp-prima">-</td>
+                        </tr>
+                        <tr>
+                            <td>Cesantías</td>
+                            <td>8.33% sobre Salario + Aux. Trans.</td>
+                            <td style="text-align: right;">$0 (No aplica)</td>
+                            <td style="text-align: right;" id="modal-emp-cesantias">-</td>
+                        </tr>
+                        <tr>
+                            <td>Intereses sobre Cesantías</td>
+                            <td>1% mensual sobre Salario + Aux. Trans.</td>
+                            <td style="text-align: right;">$0 (No aplica)</td>
+                            <td style="text-align: right;" id="modal-emp-intereses">-</td>
+                        </tr>
+                        <tr>
+                            <td>Vacaciones</td>
+                            <td>4.17% sobre Salario (sin Aux. Trans.)</td>
+                            <td style="text-align: right;">$0 (No aplica)</td>
+                            <td style="text-align: right;" id="modal-emp-vacaciones">-</td>
+                        </tr>
+                        <tr class="modal-table-total">
+                            <td><strong>Costo Mensual Liquidado</strong></td>
+                            <td>Suma total de conceptos</td>
+                            <td style="text-align: right; font-weight: 700;" id="modal-pn-total">-</td>
+                            <td style="text-align: right; font-weight: 700;" id="modal-emp-total">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 6px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 16px;">
+                    <strong>Nota sobre Persona Natural (B):</strong> Como contratista independiente, no recibe prestaciones de ley ni auxilio de transporte. Sus cotizaciones a Salud (12.5%) y Pensión (16%) las paga de forma directa sobre un IBC correspondiente al 40% de sus ingresos brutos.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="global-tooltip" style="display: none;"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+[      55ms] [LOG] DEBUG_FINANCIALS_40 {ingresoTotalMotosMensual: 20800000, ingresoAnual: 249600000, arrendamientoPorMoto: 130000, anticipoPorMoto: 40000, provisionPorMoto: 30000} @ http://localhost:8000/app.js:1270
+[      55ms] [LOG] DEBUG_FINANCIALS_0 {ingresoTotalMotosMensual: 0, ingresoAnual: 0, arrendamientoPorMoto: 130000, anticipoPorMoto: 40000, provisionPorMoto: 30000} @ http://localhost:8000/app.js:1271
+[      56ms] [LOG] DEBUG_INPUTS {cuota: input#input-cuota, sliderCuota: input#slider-cuota, motos: input#input-motos, sliderMotos: input#slider-motos, multiplier: input#input-multiplier} @ http://localhost:8000/app.js:1272

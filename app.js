@@ -32,6 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
         
         smmlv: document.getElementById("input-smmlv"),
         auxTrans: document.getElementById("input-auxtrans"),
+        numEmpleados: document.getElementById("input-num-empleados"),
+        sliderNumEmpleados: document.getElementById("slider-num-empleados"),
         pnNominaAdj: document.getElementById("input-pn-nomina-adj"),
         sliderPnNominaAdj: document.getElementById("slider-pn-nomina-adj"),
         empresaNominaAdj: document.getElementById("input-empresa-nomina-adj"),
@@ -165,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     syncInputs(inputs.multiplier, inputs.sliderMultiplier);
     syncInputs(inputs.honorarios, inputs.sliderHonorarios);
     syncInputs(inputs.mantenimiento, inputs.sliderMantenimiento);
+    syncInputs(inputs.numEmpleados, inputs.sliderNumEmpleados);
     syncInputs(inputs.pnNominaAdj, inputs.sliderPnNominaAdj);
     syncInputs(inputs.empresaNominaAdj, inputs.sliderEmpresaNominaAdj);
     syncInputs(inputs.creditoMensual, inputs.sliderCreditoMensual);
@@ -309,6 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const smmlv = parseFloat(inputs.smmlv.value) || 0;
         const auxTrans = parseFloat(inputs.auxTrans.value) || 0;
+        const numEmpleados = Math.max(1, parseInt(inputs.numEmpleados.value) || 1);
         const pnNominaAdj = parseFloat(inputs.pnNominaAdj.value) || 0;
         const empresaNominaAdj = parseFloat(inputs.empresaNominaAdj.value) || 0;
         
@@ -408,9 +412,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const vacacionesEmp = ibcEmp * 0.0417; // Vacaciones 4.17% (sin Auxilio de Transporte)
         const prestacionesEmp = primaEmp + cesantiasEmp + interesesCesantiasEmp + vacacionesEmp;
 
-        // Suma real de aportes Patronales + Salario + Auxilio de Transporte + Prestaciones
+        // Suma real de aportes Patronales + Salario + Auxilio de Transporte + Prestaciones (por empleado)
         const totalNominaEmpCalculada = ibcEmp + auxTrans + saludEmp + pensionEmp + arlEmp + cajaEmp + parafiscalesEmp + prestacionesEmp;
-        const nominaEmpMensual = Math.max(0, totalNominaEmpCalculada + empresaNominaAdj);
+        // El ajuste es un monto fijo mensual adicional (no se multiplica por empleado)
+        const nominaEmpMensual = Math.max(0, totalNominaEmpCalculada * numEmpleados + empresaNominaAdj);
         const nominaEmpAnual = nominaEmpMensual * 12;
 
         // --- IMPUESTOS MUNICIPALES (ICA) ---
@@ -507,6 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
             nominaPnAnual,
             
             exonerado,
+            numEmpleados,
             ibcEmp,
             saludEmp,
             pensionEmp,
@@ -933,9 +939,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 tooltipHtml: makeTooltip(
                     "Nómina y Cargas Laborales",
                     "Persona Natural: Aportes directos a Salud (12.5%) y Pensión (16%) liquidados sobre su IBC. Empresa: Salario Mínimo (SMMLV), Auxilio de Transporte, Aportes Patronales (ARL, Caja, Pensión) y Prestaciones (Primas, Cesantías, Intereses, Vacaciones).",
-                    "PN: (Salud + Pensión + Ajuste) * factor | SAS: (Costo Laboral Completo + Ajuste) * factor",
+                    "PN: (Salud + Pensión + Ajuste) * factor | SAS: (Costo Laboral por empleado × N° empleados + Ajuste fijo) * factor",
                     `IBC: <strong>${formatCurrency(f.ibc)}</strong> (40% del ingreso neto, limitado entre 1 y 25 SMMLV).<br>Salud (12.5%): ${formatCurrency(f.saludPn)}. Pensión (16%): ${formatCurrency(f.pensionPn)}.<br>Ajuste: ${formatCurrency(pnNominaAdj)}.<br>Total: (<strong>${formatCurrency(f.saludPn)}</strong> + <strong>${formatCurrency(f.pensionPn)}</strong> + <strong>${formatCurrency(pnNominaAdj)}</strong>) * <strong>${factor}</strong> = <strong>${formatCurrency(f.nominaPnMensual * factor)}</strong>`,
-                    `SMMLV: ${formatCurrency(smmlv)} + Aux. Trans: ${formatCurrency(auxTrans)}.<br>Salud: ${f.exonerado ? "$0 (Exento)" : formatCurrency(f.saludEmp)} | Pensión (12%): ${formatCurrency(f.pensionEmp)} | ARL: ${formatCurrency(f.arlEmp)} | Caja (4%): ${formatCurrency(f.cajaEmp)} | Parafiscales: ${f.exonerado ? "$0 (Exento)" : formatCurrency(f.parafiscalesEmp)}.<br>Prestaciones (Prima, Cesantías, Intereses, Vacaciones): ${formatCurrency(f.prestacionesEmp)}.<br>Ajuste: ${formatCurrency(empresaNominaAdj)}.<br>Total: (<strong>${formatCurrency(f.totalNominaEmpCalculada)}</strong> + <strong>${formatCurrency(empresaNominaAdj)}</strong>) * <strong>${factor}</strong> = <strong>${formatCurrency(f.nominaEmpMensual * factor)}</strong>`
+                    `SMMLV: ${formatCurrency(smmlv)} + Aux. Trans: ${formatCurrency(auxTrans)}.<br>Salud: ${f.exonerado ? "$0 (Exento)" : formatCurrency(f.saludEmp)} | Pensión (12%): ${formatCurrency(f.pensionEmp)} | ARL: ${formatCurrency(f.arlEmp)} | Caja (4%): ${formatCurrency(f.cajaEmp)} | Parafiscales: ${f.exonerado ? "$0 (Exento)" : formatCurrency(f.parafiscalesEmp)}.<br>Prestaciones (Prima, Cesantías, Intereses, Vacaciones): ${formatCurrency(f.prestacionesEmp)}.<br><strong>Costo por empleado: ${formatCurrency(f.totalNominaEmpCalculada)}</strong> × <strong>${f.numEmpleados} empleado${f.numEmpleados > 1 ? 's' : ''}</strong> = ${formatCurrency(f.totalNominaEmpCalculada * f.numEmpleados)}<br>+ Ajuste fijo: ${formatCurrency(empresaNominaAdj)}.<br>Total: <strong>${formatCurrency(f.nominaEmpMensual * factor)}</strong>`
                 )
             },
             { 
@@ -1240,8 +1246,23 @@ document.addEventListener("DOMContentLoaded", () => {
             modalCells.empIntereses.textContent = formatCurrency(f.interesesCesantiasEmp);
             modalCells.empVacaciones.textContent = formatCurrency(f.vacacionesEmp);
             
+            // Fila de totales: por empleado
             modalCells.pnTotal.textContent = formatCurrency(f.totalNominaPnCalculada);
             modalCells.empTotal.textContent = formatCurrency(f.totalNominaEmpCalculada);
+
+            // Fila adicional cuando hay más de 1 empleado
+            const totalRow = document.getElementById("modal-row-total-empleados");
+            const countLabel = document.getElementById("modal-emp-count-label");
+            const totalGlobal = document.getElementById("modal-emp-total-global");
+            if (totalRow && countLabel && totalGlobal) {
+                if (f.numEmpleados > 1) {
+                    totalRow.style.display = "";
+                    countLabel.textContent = `(${f.numEmpleados} empleados)`;
+                    totalGlobal.textContent = formatCurrency(f.nominaEmpMensual);
+                } else {
+                    totalRow.style.display = "none";
+                }
+            }
         }
 
         // 2. Update KPI cards

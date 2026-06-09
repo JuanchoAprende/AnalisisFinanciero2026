@@ -124,6 +124,15 @@
                     <div class="sidebar-divider">Nómina - Salario Mínimo Legal</div>
                     
                     <div class="form-group">
+                        <label for="input-num-empleados">Número de Empleados (Empresa)</label>
+                        <div class="input-with-slider">
+                            <input type="number" id="input-num-empleados" value="1" min="1" max="50" step="1">
+                            <input type="range" id="slider-num-empleados" value="1" min="1" max="50" step="1">
+                        </div>
+                        <small class="help-text">Cantidad de empleados contratados bajo nómina patronal en la Empresa / SAS.</small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="input-smmlv">Valor SMMLV ($)</label>
                         <input type="number" id="input-smmlv" value="1750905">
                         <small class="help-text">Salario de referencia en la simulación.</small>
@@ -392,7 +401,7 @@
     <div class="modal-backdrop" id="payroll-modal" style="display: none;">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>Desglose de Nómina Patronal Completa (2026)</h3>
+                <h3>Desglose de Nómina Patronal Total (2026)</h3>
                 <button class="modal-close-btn" id="btn-close-payroll-modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -483,10 +492,16 @@
                             <td style="text-align: right;" id="modal-emp-vacaciones">-</td>
                         </tr>
                         <tr class="modal-table-total">
-                            <td><strong>Costo Mensual Liquidado</strong></td>
+                            <td><strong>Costo por Empleado (mensual)</strong></td>
                             <td>Suma total de conceptos</td>
                             <td style="text-align: right; font-weight: 700;" id="modal-pn-total">-</td>
                             <td style="text-align: right; font-weight: 700;" id="modal-emp-total">-</td>
+                        </tr>
+                        <tr id="modal-row-total-empleados" style="display:none;">
+                            <td><strong>Costo Total Nómina <span id="modal-emp-count-label"></span></strong></td>
+                            <td style="color: var(--text-muted); font-size:0.8rem;">Por empleado × N empleados + Ajuste</td>
+                            <td style="text-align: right;">—</td>
+                            <td style="text-align: right; font-weight: 700; color: var(--accent-purple);" id="modal-emp-total-global">-</td>
                         </tr>
                     </tbody>
                 </table>

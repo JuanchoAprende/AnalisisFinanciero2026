@@ -880,14 +880,14 @@ document.addEventListener("DOMContentLoaded", () => {
             { type: "header", label: "Ingresos Operacionales" },
             { 
                 label: "Ingreso Bruto de Arrendamientos / Moto", 
-                pn: f.arrendamientoPorMoto * factor, 
-                emp: f.arrendamientoPorMoto * factor,
+                pn: f.arrendamientoPorMoto * multiplier * factor, 
+                emp: f.arrendamientoPorMoto * multiplier * factor,
                 tooltipHtml: makeTooltip(
                     "Ingreso Bruto / Moto",
-                    "El valor del canon de arrendamiento neto que genera cada moto mensualmente o anualmente, según el factor de distribución asignado.",
-                    "Cuota Base * % Arrendamiento * Factor de Periodo",
-                    `<strong>${formatCurrency(cuota)}</strong> * <strong>${Math.round(pctArrendamiento * 100)}%</strong> * <strong>${factor}</strong> = <strong>${formatCurrency(f.arrendamientoPorMoto * factor)}</strong>`,
-                    `<strong>${formatCurrency(cuota)}</strong> * <strong>${Math.round(pctArrendamiento * 100)}%</strong> * <strong>${factor}</strong> = <strong>${formatCurrency(f.arrendamientoPorMoto * factor)}</strong>`
+                    "El valor del canon de arrendamiento neto que genera cada moto mensualmente o anualmente, según el factor de distribución asignado y el multiplicador de cuotas por contrato.",
+                    "Cuota Base × % Arrendamiento × Multiplicador × Factor de Periodo",
+                    `<strong>${formatCurrency(cuota)}</strong> × <strong>${Math.round(pctArrendamiento * 100)}%</strong> × <strong>${multiplier}</strong> × <strong>${factor}</strong> = <strong>${formatCurrency(f.arrendamientoPorMoto * multiplier * factor)}</strong>`,
+                    `<strong>${formatCurrency(cuota)}</strong> × <strong>${Math.round(pctArrendamiento * 100)}%</strong> × <strong>${multiplier}</strong> × <strong>${factor}</strong> = <strong>${formatCurrency(f.arrendamientoPorMoto * multiplier * factor)}</strong>`
                 )
             },
             { 

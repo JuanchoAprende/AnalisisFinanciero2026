@@ -1323,4 +1323,48 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch(e) {
         console.error("DEBUG_ERROR", e);
     }
+
+    // PDF generation handler
+    function generatePDF() {
+        // The UMD build from unpkg exposes window.jspdf = { jsPDF: ... }
+        // Log what we find so we can debug if something is still wrong
+        console.log('window.jspdf:', window.jspdf);
+        console.log('window.jsPDF:', window.jsPDF);
+
+        let jsPDFConstructor = null;
+
+        // UMD bundle: window.jspdf.jsPDF
+        if (window.jspdf && typeof window.jspdf.jsPDF === 'function') {
+            jsPDFConstructor = window.jspdf.jsPDF;
+        }
+        // Some builds assign directly to window.jsPDF
+        else if (typeof window.jsPDF === 'function') {
+            jsPDFConstructor = window.jsPDF;
+        }
+        // Fallback: window.jspdf itself might be the constructor
+        else if (typeof window.jspdf === 'function') {
+            jsPDFConstructor = window.jspdf;
+        }
+
+        if (!jsPDFConstructor) {
+            alert('No se pudo cargar la librería jsPDF. Verifica tu conexión a internet y recarga la página.');
+            console.error('jsPDF library is not loaded. window.jspdf=', window.jspdf, 'window.jsPDF=', window.jsPDF);
+            return;
+        }
+
+        const doc = new jsPDFConstructor();
+        doc.setFontSize(18);
+        doc.text('Informe Financiero', 14, 22);
+        const table = document.querySelector('table.financial-table');
+        if (table && typeof doc.autoTable === 'function') {
+            doc.autoTable({ html: table, startY: 30 });
+        } else {
+            console.warn('autoTable plugin not available or table not found. doc.autoTable=', typeof doc.autoTable);
+        }
+        doc.save('Informe_Financiero.pdf');
+    }
+    const pdfBtn = document.getElementById('btn-download-pdf');
+    if (pdfBtn) {
+        pdfBtn.addEventListener('click', generatePDF);
+    }
 });
